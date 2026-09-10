@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy text-ink-soft antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold text-ink;
+  }
+}
+
+/* ============================================
+   LANDING PAGE — Dark Glassmorphism
+   ============================================ */
+
+/* Selection */
+.lp-root ::selection {
+  background: #a78bfa;
+  color: #000;
+}
+
+/* Scroll progress bar */
+.lp-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #a78bfa;
+  z-index: 2000;
+  transition: width 0.1s linear;
+  width: 0%;
+}
+
+/* Cursor glow — desktop only */
+.lp-cursor-glow {
+  position: fixed;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.035), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+.lp-cursor-glow.active {
+  opacity: 1;
+}
+
+/* Scroll reveal */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.lp-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glass navbar */
+.lp-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(8, 9, 13, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+.lp-nav.scrolled {
+  border-bottom-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Container */
+.lp-container {
+  width: min(1200px, calc(100% - 96px));
+  margin-inline: auto;
+}
+
+/* Hero glow */
+.lp-hero-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.08), transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card base */
+.lp-card {
+  background: #11131a;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  transition: all 0.4s ease;
+}
+.lp-card:hover {
+  background: #151821;
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-7px);
+}
+
+/* Skill card hover */
+.lp-skill-card {
+  background: #11131a;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  transition: all 0.4s ease;
+}
+.lp-skill-card:hover {
+  background: #151821;
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-8px);
+}
+
+/* ============================================
+   EXISTING — Learning content
+   ============================================ */
+.lesson-content {
+  @apply max-w-none text-[17px] leading-[1.75] text-ink-soft;
+}
+.lesson-content h1, .lesson-content h2, .lesson-content h3 {
+  @apply mt-8 mb-3 font-display font-bold text-ink;
+}
+.lesson-content h2 { @apply text-xl; }
+.lesson-content h3 { @apply text-lg; }
+.lesson-content p { @apply mb-4; }
+.lesson-content ul, .lesson-content ol { @apply mb-4 space-y-1.5 pl-6; }
+.lesson-content ul { @apply list-disc; }
+.lesson-content ol { @apply list-decimal; }
+.lesson-content a { @apply font-medium text-primary-400 underline underline-offset-2 hover:text-primary-300; }
+.lesson-content img { @apply my-6 max-w-full rounded-lg; }
+.lesson-content pre {
+  @apply overflow-x-auto rounded-lg bg-surface p-4 text-sm leading-relaxed text-ink-soft;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.lesson-content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.lesson-content :not(pre) > code { @apply rounded bg-surface px-1.5 py-0.5 text-[0.9em] text-primary-300; }
+.lesson-content table { @apply my-6 w-full border-collapse text-sm; }
+.lesson-content th, .lesson-content td { @apply border border-edge px-3 py-2 text-left; }
+.lesson-content th { @apply bg-surface font-semibold text-ink; }
+.lesson-content blockquote { @apply mb-4 border-l-4 border-primary-600 pl-4 italic text-ink-muted; }
+
+/* CKEditor */
+.ck.ck-toolbar { @apply rounded-t-lg border-edge bg-surface-hover; }
+.ck.ck-toolbar .ck.ck-toolbar__items { @apply bg-surface-hover; }
+.ck.ck-button, a.ck.ck-button {
+  color: var(--ck-color-base-foreground, #D5D6E3);
+}
+.ck-editor__editable {
+  min-height: 220px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { @apply bg-navy; }
+::-webkit-scrollbar-thumb { @apply rounded-full bg-edge; }
+::-webkit-scrollbar-thumb:hover { @apply bg-surface-hover; }
+
+/* No scrollbar utility */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Focus visible */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-500;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .lp-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

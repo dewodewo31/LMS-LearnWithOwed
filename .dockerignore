@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Build output
+client/dist
+server/dist
+
+# Environment files
+.env*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# Docs
+docs
+*.md
+!README.md
+
+# Dev tooling
+.playwright-mcp
+.omo
+.codegraph

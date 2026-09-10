@@ -1,0 +1,54 @@
+# KN-LMS Development Stack
+# Usage: docker compose up
+#
+# Services:
+#   mongo    - MongoDB 7 on localhost:27017
+#   server   - Express API on localhost:5000 (hot reload via nodemon)
+#   client   - Vite dev server on localhost:5173 (hot reload)
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  server:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - server_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/kn-lms
+      - JWT_ACCESS_SECRET=dev-access-secret-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+      - JWT_REFRESH_SECRET=dev-refresh-secret-z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4
+      - JWT_ACCESS_EXPIRES=15m
+      - JWT_REFRESH_EXPIRES=7d
+      - FRONTEND_URL=http://localhost:5173
+      - UPLOAD_PATH=./uploads
+    depends_on:
+      - mongo
+
+  client:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+    environment:
+      - VITE_API_PROXY=http://server:5000
+
+volumes:
+  mongo_data:
+  server_node_modules:
+  client_node_modules:

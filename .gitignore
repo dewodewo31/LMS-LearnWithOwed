@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+uploads/
+dist/
+coverage/
+*.log
+
+# Internal tools
+.omo/
+.playwright-mcp/
+.codegraph
+notif-panel-desktop.png
+notif-panel-fixed.png
