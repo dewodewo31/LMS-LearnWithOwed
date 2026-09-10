@@ -1,4 +1,4 @@
-# KN-LMS Production Stack
+# LearnWithOwed Production Stack
 # Usage: docker compose -f docker-compose.prod.yml up -d
 #
 # Services:
