@@ -20,7 +20,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-8 border-t border-lp-border pt-8 text-center">
           <p className="font-lp-mono text-[10px] uppercase tracking-[0.2em] text-lp-muted">
-            &copy; {new Date().getFullYear()} LearnWithOweed &mdash; Built with React / Tailwind / Vite
+            &copy; {new Date().getFullYear()} LearnWithOwed &mdash; Built with React / Tailwind / Vite
           </p>
         </div>
       </div>

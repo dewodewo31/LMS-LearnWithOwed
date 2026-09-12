@@ -20,6 +20,7 @@ const courseSchema = new mongoose.Schema(
     status: { type: String, enum: STATUSES, default: 'draft' },
     requirements: { type: [String], default: [] },
     learningObjectives: { type: [String], default: [] },
+    isFeatured: { type: Boolean, default: false },
     totalLessons: { type: Number, default: 0, min: 0 },
     isDeleted: { type: Boolean, default: false },
     publishedAt: { type: Date, default: null },

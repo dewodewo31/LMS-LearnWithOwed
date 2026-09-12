@@ -25,7 +25,7 @@ export default function CTASection() {
           </h2>
 
           <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-lp-muted">
-            Bergabung dengan LearnWithOweed dan mulai belajar programming
+            Bergabung dengan LearnWithOwed dan mulai belajar programming
             dari nol hingga mahir. Gratis untuk memulai!
           </p>
 

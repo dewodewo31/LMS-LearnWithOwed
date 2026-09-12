@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useState, useEffect, useRef } from 'react';
 import HeroSection from './HeroSection';
+import ModulesSection from './ModulesSection';
 import FeaturesSection from './FeaturesSection';
 import HowItWorksSection from './HowItWorksSection';
 import CTASection from './CTASection';
@@ -94,6 +95,7 @@ export default function LandingPage() {
 
           {/* Desktop nav */}
           <div className="hidden items-center gap-8 md:flex">
+            <a href="#modul" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Modul</a>
             <a href="#fitur" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Fitur</a>
             <a href="#cara-kerja" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Cara Kerja</a>
             <div className="flex items-center gap-3">
@@ -126,6 +128,7 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="border-t border-lp-border bg-lp-bg/95 px-6 py-6 backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-4">
+              <a href="#modul" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Modul</a>
               <a href="#fitur" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Fitur</a>
               <a href="#cara-kerja" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Cara Kerja</a>
               <hr className="border-lp-border" />
@@ -145,6 +148,7 @@ export default function LandingPage() {
       {/* Main content */}
       <main>
         <HeroSection />
+        <ModulesSection />
         <FeaturesSection />
         <HowItWorksSection />
         <CTASection />

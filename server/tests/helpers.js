@@ -50,6 +50,8 @@ const createCourse = async (mentorId, overrides = {}) =>
     level: overrides.level || 'beginner',
     status: overrides.status || 'draft',
     category: overrides.category || 'Programming',
+    requirements: overrides.requirements || [],
+    learningObjectives: overrides.learningObjectives || [],
   });
 
 const addLesson = async (courseId, order, overrides = {}) =>
@@ -61,6 +63,7 @@ const addLesson = async (courseId, order, overrides = {}) =>
     youtubeUrl: overrides.contentType === 'video' ? 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' : null,
     youtubeVideoId: overrides.contentType === 'video' ? 'dQw4w9WgXcQ' : null,
     order,
+    isPublished: overrides.isPublished ?? true,
   });
 
 const enroll = async (studentId, courseId, overrides = {}) =>

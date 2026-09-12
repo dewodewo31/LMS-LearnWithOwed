@@ -17,6 +17,7 @@ const toForm = (course) => ({
   level: course.level,
   language: course.language || 'id',
   thumbnail: course.thumbnail || '',
+  isFeatured: course.isFeatured || false,
   requirements: course.requirements || [],
   learningObjectives: course.learningObjectives || [],
 });
@@ -60,6 +61,7 @@ function CourseForm({ isEdit, initial, initialDescription }) {
       level: 'beginner',
       language: 'id',
       thumbnail: '',
+      isFeatured: false,
       requirements: [],
       learningObjectives: [],
     }
@@ -176,6 +178,17 @@ function CourseForm({ isEdit, initial, initialDescription }) {
         <Field label="Deskripsi lengkap" error={errors.description} hint="Materi ini tampil di halaman course. Dibutuhkan untuk publish.">
           <RichTextEditor value={description} onChange={setDescription} />
         </Field>
+
+        <label className="flex items-center gap-3 rounded-lg border border-edge bg-surface p-4">
+          <input
+            type="checkbox"
+            checked={form.isFeatured}
+            onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+            className="h-4 w-4 rounded border-edge text-primary-400 focus:ring-primary-400"
+          />
+          <span className="text-sm font-medium text-ink">Module Featured</span>
+          <span className="text-xs text-ink-soft">Module featured ditampilkan dengan badge khusus di kartu modul.</span>
+        </label>
 
         <Field label="Learning objectives" hint="Satu poin per baris.">
           <div className="space-y-2">

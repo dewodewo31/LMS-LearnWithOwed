@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiPlay, FiCode, FiDatabase, FiServer } from 'react-icons/fi';
+import { FiArrowRight, FiLayers, FiCode, FiDatabase, FiServer } from 'react-icons/fi';
+import { useHomeModules } from '../modules/hooks';
 
 export default function HeroSection() {
+  const { data } = useHomeModules();
+  const stats = data?.stats;
   return (
     <section className="relative overflow-hidden px-4 pt-32 pb-20 sm:px-6 sm:pt-40 sm:pb-28 lg:px-8 lg:pt-44 lg:pb-36">
       {/* Background glow */}
@@ -13,7 +16,7 @@ export default function HeroSection() {
           <div className="max-w-2xl">
             {/* Eyebrow */}
             <p className="mb-5 font-lp-mono text-[11px] font-medium uppercase tracking-[0.2em] text-lp-accent">
-              Platform Belajar Coding Terstruktur
+              Learning Management System
             </p>
 
             {/* Headline */}
@@ -41,29 +44,31 @@ export default function HeroSection() {
                 <FiArrowRight className="text-base" aria-hidden="true" />
               </Link>
               <a
-                href="#fitur"
+                href="#modul"
                 className="inline-flex h-[48px] items-center justify-center gap-3 rounded-full border border-lp-border px-7 text-sm font-semibold text-lp-text transition-all hover:bg-lp-accent-soft hover:border-lp-border-hover hover:-translate-y-[3px]"
               >
-                <FiPlay className="text-base" aria-hidden="true" />
-                Lihat Fitur
+                <FiLayers className="text-base" aria-hidden="true" />
+                Jelajahi Modul
               </a>
             </div>
 
-            {/* Stats */}
-            <div className="mt-14 grid grid-cols-3 gap-8 border-t border-lp-border pt-8 max-[767px]:grid-cols-3">
-              <div className="max-[767px]:text-center">
-                <p className="font-lp-sans text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl">100+</p>
-                <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Lesson</p>
+            {/* Real platform stats — exact totals from the public API, only when published modules exist */}
+            {stats && stats.totalCourses > 0 && (
+              <div className="mt-14 grid grid-cols-3 gap-6 border-t border-lp-border pt-8 sm:gap-8">
+                <div className="max-[767px]:text-center">
+                  <p className="font-lp-sans text-2xl font-extrabold tracking-tight text-lp-text sm:text-4xl">{stats.totalCourses}</p>
+                  <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Modul Pembelajaran</p>
+                </div>
+                <div className="max-[767px]:text-center">
+                  <p className="font-lp-sans text-2xl font-extrabold tracking-tight text-lp-text sm:text-4xl">{stats.totalLessons}</p>
+                  <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Total Lesson</p>
+                </div>
+                <div className="max-[767px]:text-center">
+                  <p className="font-lp-sans text-2xl font-extrabold tracking-tight text-lp-text sm:text-4xl">{stats.categories}</p>
+                  <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Kategori</p>
+                </div>
               </div>
-              <div className="max-[767px]:text-center">
-                <p className="font-lp-sans text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl">50+</p>
-                <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Siswa</p>
-              </div>
-              <div className="max-[767px]:text-center">
-                <p className="font-lp-sans text-3xl font-extrabold tracking-tight text-lp-text sm:text-4xl">10+</p>
-                <p className="mt-1 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted">Course</p>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Right — Visual */}

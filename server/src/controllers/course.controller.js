@@ -11,6 +11,140 @@ const { activeEnrollmentOr403 } = require('../services/progressService');
 
 const escapeRx = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// GET /public/courses — unauthenticated landing-page listing. Only published,
+// non-deleted courses; exposes summary fields only — no mentor, description,
+// requirements, or status (docs/README.md §Public courses).
+const listPublicCourses = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query);
+  const filter = { isDeleted: false, status: 'published' };
+  const [total, courses] = await Promise.all([
+    Course.countDocuments(filter),
+    Course.find(filter)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('title slug shortDescription thumbnail category level language totalLessons publishedAt isFeatured')
+      .lean(),
+  ]);
+
+  return respond(res, {
+    data: {
+      courses: courses.map((c) => ({
+        id: c._id,
+        title: c.title,
+        slug: c.slug,
+        shortDescription: c.shortDescription,
+        thumbnail: c.thumbnail,
+        category: c.category,
+        level: c.level,
+        language: c.language,
+        totalLessons: c.totalLessons,
+        publishedAt: c.publishedAt,
+        isFeatured: c.isFeatured || false,
+      })),
+    },
+    meta: buildMeta({ page, limit, total }),
+  });
+});
+
+const toPublicSummary = (c) => ({
+  id: c._id,
+  title: c.title,
+  slug: c.slug,
+  shortDescription: c.shortDescription,
+  thumbnail: c.thumbnail,
+  category: c.category,
+  level: c.level,
+  language: c.language,
+  totalLessons: c.totalLessons,
+  publishedAt: c.publishedAt,
+  isFeatured: c.isFeatured || false,
+});
+
+// GET /public/courses/random — unauthenticated home-page discovery: N random
+// published courses + exact platform stats, in one aggregation (docs/README.md
+// §Public courses). One request serves the landing cards and hero stats.
+const listRandomPublicCourses = asyncHandler(async (req, res) => {
+  const limit = Math.min(8, Math.max(1, parseInt(req.query.limit, 10) || 4));
+  const filter = { isDeleted: false, status: 'published' };
+  const [agg] = await Course.aggregate([
+    { $match: filter },
+    {
+      $facet: {
+        courses: [
+          { $sample: { size: limit } },
+          {
+            $project: {
+              _id: 1, title: 1, slug: 1, shortDescription: 1, thumbnail: 1,
+              category: 1, level: 1, language: 1, totalLessons: 1, publishedAt: 1,
+              isFeatured: 1,
+            },
+          },
+        ],
+        stats: [
+          {
+            $group: {
+              _id: null,
+              totalCourses: { $sum: 1 },
+              totalLessons: { $sum: '$totalLessons' },
+              categories: { $addToSet: '$category' },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  const stats = agg.stats[0] || { totalCourses: 0, totalLessons: 0, categories: [] };
+
+  return respond(res, {
+    data: {
+      courses: agg.courses.map(toPublicSummary),
+      stats: {
+        totalCourses: stats.totalCourses,
+        totalLessons: stats.totalLessons,
+        categories: stats.categories.filter(Boolean).length,
+      },
+    },
+  });
+});
+
+// GET /public/courses/:slug — unauthenticated module detail. Public metadata
+// only: sanitized description HTML + syllabus metadata; lesson content
+// (textContent/youtube) stays behind auth (docs/SECURITY.md §5).
+const getPublicCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findOne({ slug: req.params.slug, isDeleted: false, status: 'published' })
+    .select('title slug shortDescription description thumbnail category level language totalLessons publishedAt requirements learningObjectives isFeatured')
+    .lean();
+  if (!course) throw new ApiError(404, 'Module not found');
+
+  const lessons = await Lesson.find({ courseId: course._id, isPublished: true })
+    .sort({ order: 1 })
+    .select('title order contentType duration')
+    .lean();
+
+  return respond(res, {
+    data: {
+      course: {
+        id: course._id,
+        title: course.title,
+        slug: course.slug,
+        shortDescription: course.shortDescription,
+        description: course.description,
+        thumbnail: course.thumbnail,
+        category: course.category,
+        level: course.level,
+        language: course.language,
+        totalLessons: course.totalLessons,
+        publishedAt: course.publishedAt,
+        requirements: course.requirements,
+        learningObjectives: course.learningObjectives,
+        isFeatured: course.isFeatured || false,
+      },
+      lessons: lessons.map((l) => ({ id: l._id, title: l.title, order: l.order, contentType: l.contentType, duration: l.duration })),
+    },
+  });
+});
+
 // GET /courses — admin: all, mentor: own. Students must use /courses/mine (UI-UX.md §3).
 const listCourses = asyncHandler(async (req, res) => {
   if (req.user.role === 'student') throw new ApiError(403, 'Students access their assigned courses via my-courses');
@@ -47,6 +181,7 @@ const toCourseSummary = (c) => ({
   language: c.language,
   status: c.status,
   totalLessons: c.totalLessons,
+  isFeatured: c.isFeatured || false,
   mentor: c.mentorId ? { id: c.mentorId._id, name: c.mentorId.name } : null,
   createdAt: c.createdAt,
   updatedAt: c.updatedAt,
@@ -115,7 +250,7 @@ const updateCourse = asyncHandler(async (req, res) => {
     if (!mentor) throw new ApiError(404, 'Mentor not found');
     course.mentorId = mentor._id;
   }
-  ['title', 'shortDescription', 'description', 'thumbnail', 'category', 'level', 'language', 'requirements', 'learningObjectives'].forEach((k) => {
+  ['title', 'shortDescription', 'description', 'thumbnail', 'category', 'level', 'language', 'requirements', 'learningObjectives', 'isFeatured'].forEach((k) => {
     if (payload[k] !== undefined) course[k] = payload[k];
   });
   await course.save();
@@ -262,4 +397,4 @@ const reorder = asyncHandler(async (req, res) => {
   return respond(res, { message: 'Lessons reordered', data: { lessons } });
 });
 
-module.exports = { listCourses, getCourse, createCourse, updateCourse, deleteCourse, publishCourse, archiveCourse, myCourses, addLesson, updateLesson, deleteLesson, reorder };
+module.exports = { listCourses, listPublicCourses, listRandomPublicCourses, getPublicCourse, getCourse, createCourse, updateCourse, deleteCourse, publishCourse, archiveCourse, myCourses, addLesson, updateLesson, deleteLesson, reorder };

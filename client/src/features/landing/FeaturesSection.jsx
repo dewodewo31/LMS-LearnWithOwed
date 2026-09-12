@@ -25,7 +25,7 @@ export default function FeaturesSection() {
         {/* Section header */}
         <div className="mb-16 text-center lp-reveal">
           <p className="mb-3 font-lp-mono text-[11px] font-medium uppercase tracking-[0.2em] text-lp-accent">
-            01 — Fitur
+            02 — Fitur
           </p>
           <h2 className="font-lp-sans text-[clamp(32px,5vw,52px)] font-bold tracking-[-0.05em] leading-tight text-lp-text">
             Kenapa Harus Belajar di Sini?

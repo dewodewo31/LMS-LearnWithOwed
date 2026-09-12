@@ -11,7 +11,7 @@ const steps = [
     icon: FiBook,
     number: '02',
     title: 'Akses Course',
-    description: 'Pilih course yang ingin dipelajari. Semua materi sudah tersedia dan terstruktur.',
+    description: 'Setelah admin memberikan akses, semua materi tersedia dan terstruktur untuk dipelajari.',
   },
   {
     icon: FiPlay,
@@ -34,7 +34,7 @@ export default function HowItWorksSection() {
         {/* Section header */}
         <div className="mb-16 text-center lp-reveal">
           <p className="mb-3 font-lp-mono text-[11px] font-medium uppercase tracking-[0.2em] text-lp-accent">
-            02 — Cara Kerja
+            03 — Cara Kerja
           </p>
           <h2 className="font-lp-sans text-[clamp(32px,5vw,52px)] font-bold tracking-[-0.05em] leading-tight text-lp-text">
             Mulai Belajar dalam 4 Langkah

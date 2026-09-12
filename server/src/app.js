@@ -11,6 +11,7 @@ const { generalLimiter } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/error');
 
 const authRoutes = require('./routes/auth.routes');
+const publicRoutes = require('./routes/public.routes');
 const userRoutes = require('./routes/user.routes');
 const studentRoutes = require('./routes/student.routes');
 const courseRoutes = require('./routes/course.routes');
@@ -44,6 +45,7 @@ app.use('/uploads', express.static(path.resolve(config.uploadPath)));
 app.get('/health', (_req, res) => res.json({ success: true, message: 'OK', data: { uptime: process.uptime() } }));
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1', publicRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/courses', courseRoutes);

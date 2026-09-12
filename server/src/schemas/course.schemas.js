@@ -13,6 +13,7 @@ const createCourseSchema = z.object({
   language: z.string().trim().max(10).optional().default('id'),
   requirements: z.array(z.string().trim().min(1).max(300)).max(20).optional().default([]),
   learningObjectives: z.array(z.string().trim().min(1).max(300)).max(20).optional().default([]),
+  isFeatured: z.boolean().optional(),
 });
 
 const updateCourseSchema = createCourseSchema.partial().omit({ mentorId: true }).extend({

@@ -4,6 +4,8 @@ import { RequireAuth, HomeRedirect } from './routes/Protected';
 import LandingPage from './features/landing/LandingPage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
+import AllModulesPage from './features/modules/AllModulesPage';
+import ModuleDetailPage from './features/modules/ModuleDetailPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import CoursesPage from './features/courses/CoursesPage';
 import CourseFormPage from './features/courses/CourseFormPage';
@@ -25,6 +27,8 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/modules" element={<AllModulesPage />} />
+      <Route path="/modules/:slug" element={<ModuleDetailPage />} />
 
       <Route element={<RequireAuth roles={['admin', 'mentor']} />}>
         <Route element={<AppShell />}>
