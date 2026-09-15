@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { FiArrowLeft, FiArrowDown, FiArrowUp, FiEdit2, FiFileText, FiMessageSquare, FiPlay, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowDown, FiArrowUp, FiClipboard, FiEdit2, FiFileText, FiMessageSquare, FiPlay, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { api } from '../../lib/api';
 import { useAuth } from '../auth/AuthContext';
 import Badge from '../../components/ui/Badge';
@@ -209,7 +209,7 @@ export default function CourseManagePage() {
                   </button>
                 </div>
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400">
-                  {l.contentType === 'video' ? <FiPlay aria-hidden="true" /> : <FiFileText aria-hidden="true" />}
+                  {l.contentType === 'video' ? <FiPlay aria-hidden="true" /> : l.contentType === 'assignment' ? <FiClipboard aria-hidden="true" /> : <FiFileText aria-hidden="true" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-ink">{l.title}</p>
@@ -220,6 +220,14 @@ export default function CourseManagePage() {
                   </p>
                 </div>
                 <Badge value={l.contentType} />
+                {l.contentType === 'assignment' && (
+                  <Link
+                    to={`/dashboard/lessons/${l._id}/assignment`}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary-500/10 px-3 py-1.5 text-xs font-semibold text-primary-400 transition-colors hover:bg-primary-500/20"
+                  >
+                    <FiClipboard aria-hidden="true" /> Kelola Assignment
+                  </Link>
+                )}
                 <button
                   onClick={() => setLessonModal({ mode: 'edit', lesson: l })}
                   aria-label={`Edit ${l.title}`}
@@ -293,7 +301,9 @@ function LessonModal({ courseId, lesson, onClose }) {
       const payload =
         form.contentType === 'video'
           ? { title: form.title, contentType: 'video', youtubeUrl: form.youtubeUrl, duration: null, isPublished: form.isPublished }
-          : { title: form.title, contentType: 'text', textContent: form.textContent, isPublished: form.isPublished };
+          : form.contentType === 'assignment'
+            ? { title: form.title, contentType: 'assignment', isPublished: form.isPublished }
+            : { title: form.title, contentType: 'text', textContent: form.textContent, isPublished: form.isPublished };
       if (isEdit) await api.patch(`/lessons/${lesson._id}`, payload);
       else await api.post(`/courses/${courseId}/lessons`, payload);
       qc.invalidateQueries({ queryKey: ['course', courseId] });
@@ -327,8 +337,16 @@ function LessonModal({ courseId, lesson, onClose }) {
           >
             <option value="text">Rich text</option>
             <option value="video">Video (YouTube)</option>
+            <option value="assignment">Assignment</option>
           </Select>
         </Field>
+
+        {form.contentType === 'assignment' && (
+          <p className="rounded-lg bg-primary-500/10 px-3 py-2 text-xs text-primary-400">
+            Lesson ini bertipe assignment. Setelah lesson dibuat, klik "Kelola Assignment" untuk
+            mengisi instruksi, file soal, dan kriteria penilaian.
+          </p>
+        )}
 
         {form.contentType === 'text' ? (
           <Field label="Konten" error={errors.textContent}>

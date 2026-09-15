@@ -26,6 +26,9 @@ module.exports = {
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   uploadPath: process.env.UPLOAD_PATH || './uploads',
+  // Assignment files live OUTSIDE the static /uploads root — only authorized
+  // download endpoints serve them (student submissions are private).
+  assignmentUploadPath: process.env.ASSIGNMENT_UPLOAD_PATH || './uploads-private/assignments',
   cookie: {
     httpOnly: true,
     secure: isProd,

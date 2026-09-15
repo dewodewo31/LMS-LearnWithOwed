@@ -70,7 +70,7 @@ npm run dev                        # http://localhost:5173 (proxy /api ke :5000)
 
 | Lokasi | Perintah | Fungsi |
 | ------ | -------- | ------ |
-| `server/` | `npm test` | Integration tests (104 tests) |
+| `server/` | `npm test` | Integration tests (154 tests) |
 | `server/` | `npm run seed` | Seed akun demo |
 | `client/` | `npm run build` | Production build |
 | `client/` | `npx eslint src` | Lint |

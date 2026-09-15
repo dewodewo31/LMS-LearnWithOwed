@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   FiArrowLeft, FiArrowRight, FiBookOpen, FiCheck, FiCheckCircle, FiChevronDown,
-  FiFileText, FiHelpCircle, FiMessageSquare, FiPlay,
+  FiClipboard, FiFileText, FiHelpCircle, FiMessageSquare, FiPlay,
 } from 'react-icons/fi';
 import { api } from '../../lib/api';
 import Button from '../../components/ui/Button';
@@ -15,10 +15,41 @@ import { ProtectedLessonContent, ProtectedLessonVideo } from './ProtectedLesson'
 
 function LessonIcon({ done, contentType }) {
   if (done) return <FiCheckCircle className="shrink-0 text-[#4ADE80]" aria-hidden="true" />;
+  if (contentType === 'assignment') return <FiClipboard className="shrink-0 text-ink-muted" aria-hidden="true" />;
   return contentType === 'video' ? (
     <FiPlay className="shrink-0 text-ink-muted" aria-hidden="true" />
   ) : (
     <FiFileText className="shrink-0 text-ink-muted" aria-hidden="true" />
+  );
+}
+
+function AssignmentLessonCard({ assignmentId }) {
+  if (!assignmentId) {
+    return (
+      <div role="alert" className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-5 py-4 text-sm text-[#FBBF24]">
+        Assignment belum tersedia. Silakan cek kembali nanti.
+      </div>
+    );
+  }
+  return (
+    <section className="rounded-2xl border border-edge bg-surface p-6">
+      <div className="flex items-start gap-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/10 text-primary-400" aria-hidden="true">
+          <FiClipboard className="text-xl" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-bold text-ink">Lesson ini berupa assignment</h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Baca instruksi, unduh file soal, kerjakan, lalu kumpulkan hasil tugasmu di halaman assignment.
+          </p>
+          <Link to={`/student/assignments/${assignmentId}`} className="mt-4 inline-block">
+            <Button>
+              <FiClipboard aria-hidden="true" /> Buka Assignment
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -223,6 +254,8 @@ export default function LearnPage() {
                 <div role="alert" className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-5 py-4 text-sm text-[#FBBF24]">
                   Video lesson belum dikonfigurasi.
                 </div>
+              ) : content?.contentType === 'assignment' ? (
+                <AssignmentLessonCard assignmentId={content.assignmentId} />
               ) : content?.textContent ? (
                 <article className="rounded-2xl border border-edge bg-surface p-5 lg:p-8">
                   <ProtectedLessonContent html={content.textContent} />

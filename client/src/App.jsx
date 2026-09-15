@@ -6,6 +6,10 @@ import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import AllModulesPage from './features/modules/AllModulesPage';
 import ModuleDetailPage from './features/modules/ModuleDetailPage';
+import LeaderboardPage from './features/leaderboard/LeaderboardPage';
+import TeacherAssignmentPage from './features/assignments/TeacherAssignmentPage';
+import SubmissionReviewPage from './features/assignments/SubmissionReviewPage';
+import StudentAssignmentPage from './features/assignments/StudentAssignmentPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import CoursesPage from './features/courses/CoursesPage';
 import CourseFormPage from './features/courses/CourseFormPage';
@@ -29,6 +33,7 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/modules" element={<AllModulesPage />} />
       <Route path="/modules/:slug" element={<ModuleDetailPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
 
       <Route element={<RequireAuth roles={['admin', 'mentor']} />}>
         <Route element={<AppShell />}>
@@ -39,6 +44,8 @@ export default function App() {
           <Route path="/dashboard/courses/:id/edit" element={<CourseFormPage />} />
           <Route path="/dashboard/students" element={<StudentsPage />} />
           <Route path="/dashboard/enrollments" element={<EnrollmentsPage />} />
+          <Route path="/dashboard/lessons/:lessonId/assignment" element={<TeacherAssignmentPage />} />
+          <Route path="/dashboard/assignments/submissions/:submissionId" element={<SubmissionReviewPage />} />
         </Route>
       </Route>
 
@@ -46,6 +53,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="/student" element={<StudentDashboardPage />} />
           <Route path="/student/courses" element={<MyCoursesPage />} />
+          <Route path="/student/assignments/:assignmentId" element={<StudentAssignmentPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/dashboard/courses/:courseId/community" element={<CommunityPage />} />
           <Route path="/notifications" element={<NotificationPage />} />

@@ -98,6 +98,7 @@ export default function LandingPage() {
             <a href="#modul" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Modul</a>
             <a href="#fitur" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Fitur</a>
             <a href="#cara-kerja" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Cara Kerja</a>
+            <Link to="/leaderboard" className="text-sm text-lp-muted transition-colors hover:text-lp-text">Leaderboard</Link>
             <div className="flex items-center gap-3">
               <Link
                 to="/login"
@@ -131,6 +132,7 @@ export default function LandingPage() {
               <a href="#modul" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Modul</a>
               <a href="#fitur" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Fitur</a>
               <a href="#cara-kerja" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Cara Kerja</a>
+              <Link to="/leaderboard" className="text-sm text-lp-muted hover:text-lp-text" onClick={() => setMobileMenuOpen(false)}>Leaderboard</Link>
               <hr className="border-lp-border" />
               <Link to="/login" className="text-sm font-semibold text-lp-text" onClick={() => setMobileMenuOpen(false)}>Masuk</Link>
               <Link

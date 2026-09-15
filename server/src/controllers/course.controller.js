@@ -384,6 +384,9 @@ const deleteLesson = asyncHandler(async (req, res) => {
   const course = await Course.findOne({ _id: lesson.courseId, isDeleted: false });
   if (!canManageCourse(req.user, course)) throw new ApiError(403, 'You do not have permission to modify this course');
   await lesson.deleteOne();
+  // Soft-delete the lesson's assignment (submissions are kept for audit).
+  const Assignment = require('../models/Assignment');
+  await Assignment.updateOne({ lessonId: lesson._id, isDeleted: false }, { isDeleted: true });
   await syncTotalLessons(course._id);
   return respond(res, { message: 'Lesson deleted' });
 });

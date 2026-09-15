@@ -33,4 +33,23 @@ const communityMedia = multer({
   fileFilter: fileFilterFor(communityMediaTypes, 'JPEG, PNG, WebP, MP4, WebM'),
 });
 
-module.exports = { upload, ALLOWED, communityMedia, IMAGE_MIME, communityMediaTypes };
+// Assignment code files: extension allowlist is the real boundary — code-file
+// MIME types are unreliable (often application/octet-stream). Stored, never executed.
+const CODE_EXTENSIONS = [
+  '.lua', '.js', '.jsx', '.ts', '.tsx', '.py', '.php', '.html', '.css', '.json',
+  '.zip', '.txt', '.md', '.java', '.c', '.cpp', '.cs', '.rb', '.go', '.sql', '.xml', '.yml', '.yaml',
+];
+const codeFileFilter = (_req, file, cb) => {
+  const ext = path.extname(file.originalname || '').toLowerCase();
+  if (!CODE_EXTENSIONS.includes(ext)) {
+    return cb(new ApiError(400, `Invalid file type. Allowed: ${CODE_EXTENSIONS.join(', ')}`));
+  }
+  return cb(null, true);
+};
+const assignmentFiles = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 },
+  fileFilter: codeFileFilter,
+});
+
+module.exports = { upload, ALLOWED, communityMedia, IMAGE_MIME, communityMediaTypes, assignmentFiles, CODE_EXTENSIONS };

@@ -23,7 +23,7 @@ const updateCourseSchema = createCourseSchema.partial().omit({ mentorId: true })
 const createLessonSchema = z
   .object({
     title: z.string().trim().min(1).max(200),
-    contentType: z.enum(['text', 'video']),
+    contentType: z.enum(['text', 'video', 'assignment']),
     textContent: z.string().max(200000).nullish(),
     youtubeUrl: z.string().max(500).nullish(),
     duration: z.number().int().min(0).max(600).nullish(),

@@ -59,13 +59,14 @@ const complete = asyncHandler(async (req, res) => {
 
 const LESSON_CONTENT_FIELDS = 'title contentType textContent youtubeVideoId duration order courseId isPublished';
 
-const serializeLessonContent = (lesson) => ({
+const serializeLessonContent = (lesson, assignmentId = null) => ({
   id: lesson._id,
   courseId: lesson.courseId,
   title: lesson.title,
   contentType: lesson.contentType,
   textContent: lesson.contentType === 'text' ? lesson.textContent : null,
   youtubeVideoId: lesson.contentType === 'video' ? lesson.youtubeVideoId : null,
+  ...(assignmentId ? { assignmentId } : {}),
   duration: lesson.duration,
   order: lesson.order,
 });
@@ -98,7 +99,16 @@ const getLessonContent = asyncHandler(async (req, res) => {
   }
 
   audit({ ...auditBase, action: 'LESSON_VIEW', metadata: { courseId: lesson.courseId } });
-  return respond(res, { data: { lesson: serializeLessonContent(lesson) } });
+
+  let assignmentId = null;
+  if (lesson.contentType === 'assignment') {
+    const Assignment = require('../models/Assignment');
+    const filter = { lessonId: lesson._id, isDeleted: false };
+    if (user.role === 'student') filter.status = 'published';
+    assignmentId = (await Assignment.findOne(filter).select('_id'))?._id || null;
+  }
+
+  return respond(res, { data: { lesson: serializeLessonContent(lesson, assignmentId) } });
 });
 
 module.exports = { getCourseProgress, start, complete, getLessonContent };

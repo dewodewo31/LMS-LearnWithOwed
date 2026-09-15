@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const CONTENT_TYPES = ['text', 'video'];
+const CONTENT_TYPES = ['text', 'video', 'assignment'];
 
 const lessonSchema = new mongoose.Schema(
   {

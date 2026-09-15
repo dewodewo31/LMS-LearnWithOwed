@@ -7,7 +7,7 @@ const User = require('../models/User');
  * Dedup key: recipientId + type + questionId + actorId (same actor, same question, same type).
  * Skips self-notifications (actor === recipient).
  */
-const createNotification = async ({ recipientId, actorId, type, title, message, courseId, questionId, answerId }) => {
+const createNotification = async ({ recipientId, actorId, type, title, message, courseId, questionId, answerId, assignmentId }) => {
   // Never notify yourself
   if (String(recipientId) === String(actorId)) return null;
 
@@ -19,9 +19,10 @@ const createNotification = async ({ recipientId, actorId, type, title, message, 
   const course = await Course.findOne({ _id: courseId, isDeleted: false });
   if (!course) return null;
 
-  // Dedup: same recipient + type + questionId + actorId within same question context
+  // Dedup: same recipient + type + context ids + actorId
   const filter = { recipientId, type, actorId };
   if (questionId) filter.questionId = questionId;
+  if (assignmentId) filter.assignmentId = assignmentId;
 
   const existing = await Notification.findOne(filter);
   if (existing) return existing;
@@ -35,6 +36,7 @@ const createNotification = async ({ recipientId, actorId, type, title, message, 
     courseId,
     questionId: questionId || null,
     answerId: answerId || null,
+    assignmentId: assignmentId || null,
   });
 };
 
