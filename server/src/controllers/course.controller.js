@@ -23,7 +23,7 @@ const listPublicCourses = asyncHandler(async (req, res) => {
       .sort({ publishedAt: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select('title slug shortDescription thumbnail category level language totalLessons publishedAt isFeatured')
+      .select('title slug shortDescription thumbnail category level language totalLessons publishedAt isFeatured learningObjectives')
       .lean(),
   ]);
 
@@ -59,6 +59,7 @@ const toPublicSummary = (c) => ({
   totalLessons: c.totalLessons,
   publishedAt: c.publishedAt,
   isFeatured: c.isFeatured || false,
+  learningObjectives: c.learningObjectives || [],
 });
 
 // GET /public/courses/random — unauthenticated home-page discovery: N random
@@ -77,7 +78,7 @@ const listRandomPublicCourses = asyncHandler(async (req, res) => {
             $project: {
               _id: 1, title: 1, slug: 1, shortDescription: 1, thumbnail: 1,
               category: 1, level: 1, language: 1, totalLessons: 1, publishedAt: 1,
-              isFeatured: 1,
+              isFeatured: 1, learningObjectives: 1,
             },
           },
         ],

@@ -33,28 +33,13 @@
   width: 0%;
 }
 
-/* Cursor glow — desktop only */
-.lp-cursor-glow {
-  position: fixed;
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.035), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
-  opacity: 0;
-}
-.lp-cursor-glow.active {
-  opacity: 1;
-}
+/* Cursor glow removed — perpetual motion with no UX purpose (R-19) */
 
 /* Scroll reveal */
 .lp-reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 .lp-reveal.visible {
   opacity: 1;
@@ -84,42 +69,28 @@
   margin-inline: auto;
 }
 
-/* Hero glow */
-.lp-hero-glow {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.08), transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-}
+/* Hero glow removed — purple radial glow is generic AI default (R-01) */
 
 /* Card base */
 .lp-card {
   background: #11131a;
   border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 20px;
-  transition: all 0.4s ease;
+  border-radius: 16px;
+  transition: border-color 0.3s ease;
 }
 .lp-card:hover {
-  background: #151821;
   border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-7px);
 }
 
 /* Skill card hover */
 .lp-skill-card {
   background: #11131a;
   border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 20px;
-  transition: all 0.4s ease;
+  border-radius: 16px;
+  transition: border-color 0.3s ease;
 }
 .lp-skill-card:hover {
-  background: #151821;
   border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-8px);
 }
 
 /* ============================================

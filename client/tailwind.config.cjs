@@ -49,11 +49,14 @@ module.exports = {
         'lp-mono': ['DM Mono', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
+        none: '0',
+        sm: '8px',
         DEFAULT: '12px',
         lg: '16px',
         xl: '20px',
         '2xl': '24px',
         '3xl': '28px',
+        full: '9999px',
       },
       boxShadow: {
         sm: '0 1px 2px 0 rgb(0 0 0 / 0.3)',

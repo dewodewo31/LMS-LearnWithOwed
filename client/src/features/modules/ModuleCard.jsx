@@ -1,15 +1,22 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiBookOpen, FiLayers, FiStar } from 'react-icons/fi';
+import { FiBookOpen, FiStar } from 'react-icons/fi';
 
-const pad = (n) => String(n).padStart(2, '0');
+const LEVEL_MAP = {
+  beginner: { label: 'Pemula', color: 'text-emerald-400' },
+  intermediate: { label: 'Menengah', color: 'text-amber-400' },
+  advanced: { label: 'Lanjut', color: 'text-rose-400' },
+};
 
 export default function ModuleCard({ course, index = 0 }) {
+  const level = LEVEL_MAP[course.level] || LEVEL_MAP.beginner;
+
   return (
     <Link
       to={`/modules/${course.slug}`}
-      className="group flex flex-col overflow-hidden rounded-[20px] border border-lp-border bg-lp-card transition-all duration-300 hover:border-lp-border-hover hover:-translate-y-1.5"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-lp-border bg-lp-card transition-colors hover:border-lp-border-hover"
     >
-      <div className="relative aspect-video overflow-hidden">
+      {/* Thumbnail area */}
+      <div className="relative aspect-[16/10] overflow-hidden bg-lp-bg-soft">
         {course.thumbnail ? (
           <img
             src={course.thumbnail}
@@ -18,44 +25,72 @@ export default function ModuleCard({ course, index = 0 }) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-lp-accent-soft">
-            <FiBookOpen className="text-3xl text-lp-accent" aria-hidden="true" />
-            <span className="font-lp-mono text-[10px] uppercase tracking-[0.25em] text-lp-muted-light">
-              {course.category || 'Modul Pembelajaran'}
-            </span>
+          <div className="flex h-full w-full items-center justify-center">
+            <FiBookOpen className="text-4xl text-lp-border" aria-hidden="true" />
           </div>
         )}
         {course.isFeatured && (
-          <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 px-3 py-1 font-lp-mono text-[10px] font-bold uppercase tracking-wider text-amber-950 shadow-[0_2px_12px_rgba(245,158,11,0.45)] ring-1 ring-yellow-300/50">
-            <FiStar aria-hidden="true" className="fill-current text-[11px]" />
-            FEATURED
+          <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2.5 py-1 font-lp-mono text-[9px] font-bold uppercase tracking-wider text-amber-950">
+            <FiStar aria-hidden="true" className="fill-current" />
+            Featured
           </span>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
-        <p className="font-lp-mono text-[11px] font-medium uppercase tracking-[0.2em] text-lp-accent">
-          {course.category || `Modul ${pad(index + 1)}`}
-        </p>
-        <h3 className="mt-2 line-clamp-2 font-lp-sans text-lg font-bold leading-snug text-lp-text">
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-5">
+        {/* Category + Level */}
+        <div className="flex items-center gap-2 text-[11px]">
+          <span className="font-lp-mono font-medium uppercase tracking-[0.15em] text-lp-accent">
+            {course.category || `Modul ${index + 1}`}
+          </span>
+          <span className="text-lp-border">·</span>
+          <span className={`font-lp-mono font-medium uppercase tracking-wider ${level.color}`}>
+            {level.label}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="mt-2.5 line-clamp-2 font-lp-sans text-base font-bold leading-snug text-lp-text">
           {course.title}
         </h3>
+
+        {/* Tentang Modul */}
         {course.shortDescription && (
-          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-lp-muted">{course.shortDescription}</p>
+          <div className="mt-3">
+            <p className="font-lp-mono text-[10px] font-medium uppercase tracking-[0.12em] text-lp-muted">
+              Tentang Modul
+            </p>
+            <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-lp-muted">
+              {course.shortDescription}
+            </p>
+          </div>
         )}
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-          {course.totalLessons > 0 ? (
-            <span className="inline-flex items-center gap-1.5 font-lp-mono text-[11px] uppercase tracking-widest text-lp-muted-light">
-              <FiLayers aria-hidden="true" />
-              {course.totalLessons} {course.totalLessons === 1 ? 'Lesson' : 'Lessons'}
-            </span>
-          ) : (
-            <span />
-          )}
-          <span className="inline-flex items-center gap-2 rounded-full bg-lp-text px-5 py-2.5 text-xs font-bold text-lp-bg transition-colors group-hover:bg-lp-accent">
-            Lihat Modul
-            <FiArrowRight aria-hidden="true" />
+        {/* Poin Pembelajaran */}
+        {course.learningObjectives?.length > 0 && (
+          <div className="mt-3">
+            <p className="font-lp-mono text-[10px] font-medium uppercase tracking-[0.12em] text-lp-muted">
+              Poin Pembelajaran
+            </p>
+            <ul className="mt-1.5 space-y-1">
+              {course.learningObjectives.slice(0, 3).map((obj, i) => (
+                <li key={i} className="flex items-start gap-2 text-[12px] leading-snug text-lp-muted">
+                  <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-lp-accent" />
+                  <span className="line-clamp-1">{obj}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="mt-auto flex items-center justify-between border-t border-lp-border pt-4">
+          <span className="font-lp-mono text-[10px] uppercase tracking-wider text-lp-muted">
+            {course.totalLessons || 0} lesson
+          </span>
+          <span className="font-lp-sans text-xs font-semibold text-lp-text transition-colors group-hover:text-lp-accent">
+            Lihat Detail
           </span>
         </div>
       </div>

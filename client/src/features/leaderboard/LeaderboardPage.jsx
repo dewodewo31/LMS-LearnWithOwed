@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowLeft, FiBookOpen } from 'react-icons/fi';
+import { useAuth } from '../auth/AuthContext';
 import { useLessonsLeaderboard, useModulesLeaderboard } from './hooks';
 
 const TABS = [
@@ -8,20 +9,32 @@ const TABS = [
   { key: 'modules', label: 'Most Modules Enrolled' },
 ];
 
-function PodiumAvatar({ student, rank }) {
-  const size = rank === 1 ? 'h-20 w-20 text-2xl' : 'h-16 w-16 text-lg';
-  const ring = rank === 1 ? 'ring-2 ring-amber-400/60' : 'ring-1 ring-lp-border';
+const RANK_STYLES = {
+  1: { accent: '#ffb703', ring: 'ring-[#ffb703]/60', text: 'text-[#d4a843]' },
+  2: { accent: '#00b4d8', ring: 'ring-[#00b4d8]/50', text: 'text-[#00b4d8]' },
+  3: { accent: '#2ec4b6', ring: 'ring-[#2ec4b6]/50', text: 'text-[#2ec4b6]' },
+};
+
+function PodiumAvatar({ student, rank, size }) {
+  const cfg = RANK_STYLES[rank];
+  const initial = student.displayName?.charAt(0)?.toUpperCase() || '?';
+  const sizeClass = size === 'lg' ? 'h-20 w-20 text-2xl' : 'h-14 w-14 text-base';
+
   if (student.avatar) {
-    return <img src={student.avatar} alt={student.displayName} className={`${size} rounded-full object-cover ${ring}`} />;
+    return (
+      <div className="relative">
+        <img src={student.avatar} alt={student.displayName} className={`${sizeClass} rounded-full object-cover ring-4 ${cfg.ring}`} />
+      </div>
+    );
   }
   return (
-    <div className={`${size} flex items-center justify-center rounded-full bg-primary-600 font-display font-bold text-white ${ring}`} aria-hidden="true">
-      {student.displayName?.charAt(0)?.toUpperCase() || '?'}
+    <div className={`${sizeClass} flex items-center justify-center rounded-full bg-lp-accent-soft font-lp-sans font-bold text-lp-accent ring-4 ${cfg.ring}`} aria-hidden="true">
+      {initial}
     </div>
   );
 }
 
-function Podium({ entries, tab }) {
+function Podium({ entries, tab, currentUserId }) {
   const top3 = entries.slice(0, 3);
   if (top3.length === 0) return null;
 
@@ -29,24 +42,33 @@ function Podium({ entries, tab }) {
   const unit = tab === 'lessons' ? 'Lessons' : 'Modules';
 
   return (
-    <div className="flex items-end justify-center gap-4 sm:gap-6 md:gap-8" role="list" aria-label="Top 3">
+    <div className="flex items-start justify-center gap-3 sm:gap-5" role="list" aria-label="Top 3">
       {order.map((idx) => {
         const entry = top3[idx];
         if (!entry) return null;
         const rank = entry.rank;
-        const heights = { 1: 'pb-0', 2: 'pb-4', 3: 'pb-2' };
+        const cfg = RANK_STYLES[rank];
+        const isChampion = rank === 1;
+        const isCurrentUser = entry.student.id === currentUserId;
+        const topOffset = isChampion ? '' : 'mt-8';
+
         return (
-          <div key={entry.student.id} className={`flex flex-col items-center ${heights[rank]}`} role="listitem">
-            <PodiumAvatar student={entry.student} rank={rank} />
-            <p className="mt-3 max-w-[120px] truncate font-lp-sans text-sm font-bold text-lp-text sm:max-w-[160px]">
+          <div key={entry.student.id} className={`flex flex-col items-center ${topOffset}`} role="listitem">
+            <PodiumAvatar student={entry.student} rank={rank} size={isChampion ? 'lg' : 'sm'} />
+            <p className="mt-3 max-w-[100px] truncate text-center font-lp-sans text-xs font-bold text-lp-text sm:max-w-[120px] sm:text-sm">
               {entry.student.displayName}
             </p>
-            <p className="mt-0.5 font-lp-mono text-xs text-lp-muted">
-              {entry.value} {entry.value === 1 ? unit.replace(/s$/, '') : unit}
+            <p className={`mt-1 font-lp-mono text-base font-extrabold ${cfg.text} sm:text-lg`}>
+              {entry.value}
             </p>
-            <div className={`mt-2 font-lp-mono text-[11px] font-bold uppercase tracking-widest ${rank === 1 ? 'text-amber-400' : 'text-lp-muted-light'}`}>
-              #{rank}
-            </div>
+            <p className="mt-0.5 font-lp-mono text-[10px] text-[#8a99ad]">
+              {entry.value === 1 ? unit.replace(/s$/, '') : unit}
+            </p>
+            {isCurrentUser && (
+              <span className="mt-2 rounded-full bg-lp-accent-soft px-2 py-0.5 font-lp-mono text-[9px] font-bold text-lp-accent">
+                Kamu
+              </span>
+            )}
           </div>
         );
       })}
@@ -54,20 +76,47 @@ function Podium({ entries, tab }) {
   );
 }
 
-function LeaderboardRow({ entry, tab }) {
+function LeaderboardRow({ entry, tab, maxVal, currentUserId }) {
+  const rank = entry.rank;
+  const cfg = RANK_STYLES[rank];
+  const rankColor = cfg ? cfg.text : 'text-lp-muted-light';
+  const unit = tab === 'lessons' ? (entry.value === 1 ? 'Lesson' : 'Lessons') : 'Modules';
+  const initial = entry.student.displayName?.charAt(0)?.toUpperCase() || '?';
+  const isCurrentUser = entry.student.id === currentUserId;
+  const progress = maxVal > 0 ? (entry.value / maxVal) * 100 : 0;
+
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-lp-border bg-lp-card px-5 py-4 transition-colors hover:bg-lp-card-hover">
-      <span className="w-8 text-center font-lp-mono text-sm font-bold text-lp-muted-light">#{entry.rank}</span>
+    <div className={`flex items-center gap-3 border-b border-lp-border py-3 last:border-b-0 sm:gap-4 ${isCurrentUser ? 'bg-lp-accent-soft/30 -mx-4 px-4 sm:-mx-5 sm:px-5' : ''}`}>
+      <span className={`w-7 text-center font-lp-mono text-sm font-bold ${rankColor}`}>
+        #{rank}
+      </span>
+
       {entry.student.avatar ? (
-        <img src={entry.student.avatar} alt={entry.student.displayName} className="h-10 w-10 rounded-full object-cover" />
+        <img src={entry.student.avatar} alt={entry.student.displayName} className="h-8 w-8 shrink-0 rounded-full object-cover" />
       ) : (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 font-display text-sm font-bold text-white" aria-hidden="true">
-          {entry.student.displayName?.charAt(0)?.toUpperCase() || '?'}
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lp-accent-soft font-lp-sans text-xs font-bold text-lp-accent" aria-hidden="true">
+          {initial}
         </div>
       )}
-      <span className="flex-1 truncate font-lp-sans text-sm font-semibold text-lp-text">{entry.student.displayName}</span>
-      <span className="font-lp-mono text-sm font-bold text-lp-accent">
-        {entry.value} {tab === 'lessons' ? (entry.value === 1 ? 'Lesson' : 'Lessons') : 'Modules'}
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span className="truncate font-lp-sans text-sm font-medium text-lp-text">
+            {entry.student.displayName}
+          </span>
+          {isCurrentUser && (
+            <span className="shrink-0 rounded-full bg-lp-accent-soft px-1.5 py-0.5 font-lp-mono text-[8px] font-bold text-lp-accent">
+              Kamu
+            </span>
+          )}
+        </div>
+        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-lp-border">
+          <div className="h-full rounded-full bg-lp-accent/60" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+
+      <span className="shrink-0 text-right font-lp-mono text-xs text-lp-muted">
+        {entry.value} {unit}
       </span>
     </div>
   );
@@ -75,41 +124,72 @@ function LeaderboardRow({ entry, tab }) {
 
 function RowSkeleton() {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-lp-border bg-lp-card px-5 py-4" aria-hidden="true">
-      <div className="h-4 w-8 animate-pulse rounded bg-lp-card-hover" />
-      <div className="h-10 w-10 animate-pulse rounded-full bg-lp-card-hover" />
-      <div className="h-4 flex-1 animate-pulse rounded bg-lp-card-hover" />
-      <div className="h-4 w-20 animate-pulse rounded bg-lp-card-hover" />
+    <div className="flex items-center gap-3 border-b border-lp-border py-3 last:border-b-0 sm:gap-4" aria-hidden="true">
+      <div className="h-4 w-7 animate-pulse rounded bg-lp-card-hover" />
+      <div className="h-8 w-8 animate-pulse rounded-full bg-lp-card-hover" />
+      <div className="flex-1 space-y-2">
+        <div className="h-3 w-24 animate-pulse rounded bg-lp-card-hover" />
+        <div className="h-1 w-full animate-pulse rounded-full bg-lp-card-hover" />
+      </div>
+      <div className="h-3 w-16 animate-pulse rounded bg-lp-card-hover" />
     </div>
   );
 }
 
 function PodiumSkeleton() {
   return (
-    <div className="flex items-end justify-center gap-6" aria-hidden="true">
+    <div className="flex items-end justify-center gap-5" aria-hidden="true">
       {[2, 1, 3].map((r) => (
         <div key={r} className="flex flex-col items-center">
-          <div className={`animate-pulse rounded-full bg-lp-card-hover ${r === 1 ? 'h-20 w-20' : 'h-16 w-16'}`} />
-          <div className="mt-3 h-4 w-24 animate-pulse rounded bg-lp-card-hover" />
-          <div className="mt-1 h-3 w-16 animate-pulse rounded bg-lp-card-hover" />
+          <div className={`animate-pulse rounded-full bg-lp-card-hover ${r === 1 ? 'h-20 w-20' : 'h-14 w-14'}`} />
+          <div className="mt-3 h-3 w-20 animate-pulse rounded bg-lp-card-hover" />
+          <div className="mt-1 h-4 w-12 animate-pulse rounded bg-lp-card-hover" />
         </div>
       ))}
     </div>
   );
 }
 
+function StickyYourRank({ entry, tab }) {
+  if (!entry) return null;
+  const unit = tab === 'lessons' ? (entry.value === 1 ? 'Lesson' : 'Lessons') : 'Modules';
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-lp-border bg-lp-card/95 px-4 py-3 backdrop-blur-sm sm:px-6">
+      <div className="mx-auto flex max-w-2xl items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="font-lp-mono text-sm font-bold text-lp-accent">#{entry.rank}</span>
+          <span className="font-lp-sans text-sm font-medium text-lp-text">{entry.student.displayName}</span>
+        </div>
+        <span className="font-lp-mono text-xs text-lp-muted">
+          {entry.value} {unit}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function LeaderboardPage() {
+  const { user } = useAuth();
   const [tab, setTab] = useState('lessons');
-  const lessonsQuery = useLessonsLeaderboard(10);
-  const modulesQuery = useModulesLeaderboard(10);
+  const lessonsQuery = useLessonsLeaderboard(20);
+  const modulesQuery = useModulesLeaderboard(20);
 
   const active = tab === 'lessons' ? lessonsQuery : modulesQuery;
   const entries = active.data ?? [];
   const loading = active.isLoading;
   const error = active.error;
 
+  const maxVal = entries.length > 0 ? Math.max(...entries.map((e) => e.value)) : 0;
+  const visible = entries.slice(0, 10);
+  const top3 = visible.slice(0, 3);
+  const rest = visible.slice(3);
+  const currentUserId = user?._id || user?.id;
+  const myEntry = entries.find((e) => e.student.id === currentUserId);
+  const isInTop5 = myEntry && myEntry.rank <= 5;
+
   return (
-    <div className="min-h-screen bg-lp-bg-soft">
+    <div className="min-h-screen bg-lp-bg-soft pb-20">
       <header className="border-b border-lp-border bg-lp-bg/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center px-4 sm:px-6">
           <Link
@@ -122,7 +202,7 @@ export default function LeaderboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+      <main className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
         <header className="mb-10 text-center">
           <p className="mb-3 font-lp-mono text-[11px] font-medium uppercase tracking-[0.2em] text-lp-accent">
             Leaderboard
@@ -167,8 +247,8 @@ export default function LeaderboardPage() {
         ) : loading ? (
           <div className="space-y-10">
             <PodiumSkeleton />
-            <div className="space-y-3">
-              {Array.from({ length: 7 }).map((_, i) => (
+            <div className="rounded-xl border border-lp-border bg-lp-card px-4 sm:px-5">
+              {Array.from({ length: 5 }).map((_, i) => (
                 <RowSkeleton key={i} />
               ))}
             </div>
@@ -184,23 +264,33 @@ export default function LeaderboardPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-10">
-            {entries.length >= 1 && (
+          <div className="space-y-8">
+            {top3.length > 0 && (
               <section aria-label="Top 3">
-                <Podium entries={entries} tab={tab} />
+                <Podium entries={entries} tab={tab} currentUserId={currentUserId} />
               </section>
             )}
 
-            {entries.length > 3 && (
-              <section className="space-y-3" aria-label="Peringkat lainnya">
-                {entries.slice(3).map((entry) => (
-                  <LeaderboardRow key={entry.student.id} entry={entry} tab={tab} />
+            {rest.length > 0 && (
+              <section className="rounded-xl border border-lp-border bg-lp-card px-4 sm:px-5" aria-label="Peringkat lainnya">
+                {rest.map((entry) => (
+                  <LeaderboardRow
+                    key={entry.student.id}
+                    entry={entry}
+                    tab={tab}
+                    maxVal={maxVal}
+                    currentUserId={currentUserId}
+                  />
                 ))}
               </section>
             )}
           </div>
         )}
       </main>
+
+      {!loading && !isInTop5 && myEntry && (
+        <StickyYourRank entry={myEntry} tab={tab} />
+      )}
     </div>
   );
 }
